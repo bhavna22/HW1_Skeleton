@@ -17,7 +17,7 @@ public class NetworkUtils {
     final static String Param_Query ="q";
 
 
-    public static URL builder_url (String searchQuery) {
+    public static URL builderURL (String searchQuery) {
          Uri builtUri = Uri.parse(Base_Url).buildUpon().appendQueryParameter(Param_Query,"85826d19e37d4f80bc965f6c9710b8f0").build();
          URL url = null;
          try {

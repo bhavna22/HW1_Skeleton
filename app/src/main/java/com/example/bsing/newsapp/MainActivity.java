@@ -3,6 +3,8 @@ package com.example.bsing.newsapp;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuInflater;
 import android.widget.TextView;
 import android.widget.EditText;
 import java.net.URL;
@@ -10,54 +12,49 @@ import java.io.IOException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView text;
-    private EditText mSearchBoxEditText;
+    protected MenuItem refreshItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        text = (TextView) findViewById(R.id.text);
-        mSearchBoxEditText = (EditText) findViewById(R.id.et_search_box);
 
-
-    }
-    public void display(String message){
-        text.setText(message);
-
-    }
-
-    private URL makeGithubSearchQuery() {
-        String githubQuery = mSearchBoxEditText.getText().toString();
-        URL githubSearchUrl = NetworkUtils.builder_url(githubQuery);
-        String urlString = githubSearchUrl.toString();
-        Log.d("mycode", urlString);
-        return githubSearchUrl;
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
 
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater mMenuInflater = getMenuInflater();
+        mMenuInflater.inflate(R.menu.get_news, menu);
+        return true;
+    }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemThatWasClickedId = item.getItemId();
-        if (itemThatWasClickedId == R.id.action_search) {
-            URL url = makeGithubSearchQuery();
-            httpRequestUrl task = new httpRequestUrl();
-            task.execute(url);
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                this.refreshItem = item;
+                item.setVisible(false); // hide refresh button
 
-            return true;
+                Toast.makeText(getApplicationContext(), "REFRESH CLICKED", Toast.LENGTH_SHORT).show();
+                new NewsQueryTask().execute();
+                return true;
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
-    public class httpRequestUrl extends AsyncTask<URL, Void, String> {
+
+
+
+    public class NewsQueryTask extends AsyncTask<URL, Void, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -78,9 +75,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
 
             super.onPostExecute(s);
+            refreshItem.setVisible(true);
 
-            String displayUrl = doInBackground();
-            display(displayUrl);
 
         }
 
